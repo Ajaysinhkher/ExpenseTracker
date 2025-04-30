@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addGroup, getGroup } from '../features/groupSlice';
-import { addExpense,updateExpense ,deleteExpense,getTotalExpense } from '../features/expenseSlice';
+import { addExpense,updateExpense ,deleteExpense,getTotalExpense ,downloadPDF,downloadCsv} from '../features/expenseSlice';
 import MonthlyPieChart from './MonthlyPieChart';
 
 
 function Dashboard() {
   const dispatch = useDispatch();
   const groups = useSelector((state) => state.group.groups);
+  console.log(groups);
+  
   const summary = useSelector((state) => state.expense.summary);
-  console.log("summary",summary)
+  // console.log("summary",summary)
 
   const [addGroupModal, setAddGroupModal] = useState(false);
   const [groupName, setGroupName] = useState('');
@@ -81,15 +83,15 @@ function Dashboard() {
     dispatch(getGroup());
   }
 
-  // useEffect(() => {
-  //   // dispatch(getTotalExpense());  // Ensure this is being called to populate the summary.
-  // }, [dispatch]);
+  // handle download pdf onclick:
 
+  const handlePdfDownload = (groups)=>{
+    dispatch(downloadPDF(groups))
+  }
 
-
-
-
- // Keep your imports and logic exactly the same...
+  const handleCsvDownload = (groups)=>{
+    dispatch(downloadCsv(groups));
+  }
 
 return (
   <div className="min-h-screen bg-gray-50">
@@ -117,6 +119,20 @@ return (
           <h1 className="text-lg font-semibold text-gray-800">Overview</h1>
           <span className="text-sm text-gray-500">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
         </div>
+        <button
+          onClick={()=>handlePdfDownload(groups)}
+          className="bg-gray-700 text-white px-4 py-1.5 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm flex items-center space-x-1"
+        >
+          <span>Download Pdf</span>
+        </button>
+
+        <button
+          onClick={()=>handleCsvDownload(groups)}
+          className="bg-gray-700 text-white px-4 py-1.5 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm flex items-center space-x-1"
+        >
+          <span>Download CSV</span>
+        </button>
+
         <button
           onClick={() => setAddGroupModal(true)}
           className="bg-gray-700 text-white px-4 py-1.5 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm flex items-center space-x-1"

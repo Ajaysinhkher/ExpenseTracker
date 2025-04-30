@@ -15,15 +15,6 @@ export const addExpense = createAsyncThunk('expense/add', async (expenseData, th
   }
 });
 
-// export const getExpenses = createAsyncThunk('expense/get', async (_, thunkAPI) => {
-//   try {
-//     const response = await axiosInstance.get('/expense/get');
-//     return response.data;
-//   } catch (error) {
-//     return thunkAPI.rejectWithValue(error.response?.data?.message || 'Expenses not found!');
-//   }
-  
-// });
 
 
 export const updateExpense = createAsyncThunk('expense/update', async (expenseData, thunkAPI) => {
@@ -61,7 +52,7 @@ export const getTotalExpense = createAsyncThunk('expense/total',async(_,thunkAPI
       console.log("inside get totalexpense");
 
       const response  = await axiosInstance.get('/expense/total');
-      console.log("total expense :",response.data);
+      // console.log("total expense :",response.data);
       
       return response.data; 
     }catch(error){
@@ -69,6 +60,70 @@ export const getTotalExpense = createAsyncThunk('expense/total',async(_,thunkAPI
     }
 
 });
+
+
+
+// api to download pdf:
+export const downloadPDF = createAsyncThunk('expense/downloadPDF', async (groupsData, thunkAPI) => {
+  try {
+    console.log("inside download pdf");
+    
+    const response = await axiosInstance.post('/expense/pdf', { groups: groupsData },{
+      responseType: 'blob', // important for binary file
+    });
+
+    // Create a blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'expenses.pdf';
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return 'PDF downloaded successfully';
+  } catch (error) {
+    return thunkAPI.rejectWithValue('Failed to export PDF');
+  }
+});
+
+
+export const downloadCsv = createAsyncThunk('expense/downloadCSV', async (groupsData, thunkAPI) => {
+  try {
+    console.log("inside download csv");
+
+    const response = await axiosInstance.post('/expense/csv', { groups: groupsData }, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'text/csv',
+        // 'Content-Type': 'application/json',
+      },
+    });
+
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'expenses.csv';
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return 'CSV downloaded successfully';
+  } catch (error) {
+    return thunkAPI.rejectWithValue('Failed to export CSV');
+  }
+});
+
+
 
 const initialState = {
   expenses: [],

@@ -6,6 +6,8 @@ use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Response;
 
 class ExpenseController extends Controller
 {
@@ -125,6 +127,64 @@ class ExpenseController extends Controller
             'total_expense' => $totalExpense,
             'monthly_expense' => $monthlyExpense,
             'highest_expense' => $highestExpenseThisMonth
+        ]);
+    }
+
+
+    public function downloadpdf(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated user'], 401);
+        }
+
+        $groups = $request->input('groups');
+
+        // Optional: you can validate structure
+        if (!is_array($groups)) {
+            return response()->json(['error' => 'Invalid data format'], 422);
+        }
+
+        $pdf = Pdf::loadView('pdf.expenses', ['groups' => $groups, 'user' => $user->name]);
+
+        return $pdf->download('expenses.pdf');
+    }
+
+
+    public function downloadcsv(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated user'], 401);
+        }
+
+        $groups = $request->input('groups');
+
+        if (!is_array($groups)) {
+            return response()->json(['error' => 'Invalid data format'], 422);
+        }
+
+        // Create CSV content
+        $csv = "Group Name,Expense Description,Amount,Date\n";
+        foreach ($groups as $group) {
+            $groupName = $group['name'] ?? 'Unknown';
+            foreach ($group['expenses'] ?? [] as $expense) {
+                $csv .= sprintf(
+                    "\"%s\",\"%s\",%s,%s\n",
+                    $groupName,
+                    $expense['description'] ?? '',
+                    $expense['amount'] ?? '',
+                    $expense['date'] ?? ''
+                );
+            }
+        }
+
+        $filename = "expenses.csv";
+
+        // Return response as downloadable CSV
+        return Response::make($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
         ]);
     }
     

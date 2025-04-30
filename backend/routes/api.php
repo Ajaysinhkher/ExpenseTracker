@@ -24,3 +24,7 @@ Route::middleware('auth:sanctum')->put('/expense/update',[ExpenseController::cla
 Route::middleware('auth:sanctum')->delete('/expense/delete/{id}',[ExpenseController::class,'destroy']);
 
 Route::middleware('auth:sanctum')->get('/expense/total',[ExpenseController::class,'total']);
+
+Route::middleware('auth:sanctum')->post('/expense/pdf',[ExpenseController::class,'downloadpdf']);
+Route::middleware('auth:sanctum')->post('/expense/csv', [ExpenseController::class, 'downloadcsv']);
+
