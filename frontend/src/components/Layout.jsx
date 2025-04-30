@@ -6,8 +6,11 @@ import { Outlet ,Navigate} from 'react-router'
 import { getUser } from '../features/authSlice';
 
 
+
 function Layout() {
 
+
+ 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const token = localStorage.getItem('token');
@@ -28,6 +31,7 @@ function Layout() {
     <div>
       <Header/>
       <Outlet/>
+    
     </div>
   )
 }

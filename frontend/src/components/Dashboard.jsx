@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addGroup, getGroup } from '../features/groupSlice';
 import { addExpense,updateExpense ,deleteExpense,getTotalExpense } from '../features/expenseSlice';
+import MonthlyPieChart from './MonthlyPieChart';
+
 
 function Dashboard() {
   const dispatch = useDispatch();
@@ -90,92 +92,100 @@ function Dashboard() {
  // Keep your imports and logic exactly the same...
 
 return (
-  <div className="min-h-screen bg-gray-100">
+  <div className="min-h-screen bg-gray-50">
     <style>
       {`
         .scrollbar::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
+          width: 4px;
+          height: 4px;
         }
         .scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
+          background: #f3f4f6;
         }
         .scrollbar::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 3px;
+          background: #9ca3af;
+          border-radius: 4px;
         }
         .scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #555;
+          background: #6b7280;
         }
       `}
     </style>
-    <div className="p-4 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-base font-medium text-gray-700">Dashboard</h1>
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center space-x-2">
+          <h1 className="text-lg font-semibold text-gray-800">Overview</h1>
+          <span className="text-sm text-gray-500">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+        </div>
         <button
           onClick={() => setAddGroupModal(true)}
-          className="bg-gray-600 text-white px-2 py-1 text-xs rounded-sm hover:bg-gray-700 transition-all duration-200"
+          className="bg-gray-700 text-white px-4 py-1.5 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm flex items-center space-x-1"
         >
-          Add Group
+          <span>New Group</span>
         </button>
       </div>
 
-      <div className="flex gap-6">
-        {/* Left side - Static Summary Bar */}
-        <div className="w-1/4">
-          <div className="bg-white border border-gray-200">
-            <div className="px-4 py-3 space-y-6">
+      <div className="flex gap-8">
+        {/* Left side - Stats & Chart */}
+        <div className="w-1/4 space-y-6">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="px-5 py-4 space-y-4">
               <div>
-                <p className="text-sm text-gray-500">Total Expense</p>
-                <p className="text-xl font-medium text-gray-800">₹{summary.total}</p>
+                <p className="text-xs uppercase tracking-wider text-gray-500 font-medium">Total Expense</p>
+                <p className="text-xl font-semibold text-gray-800 mt-1">₹{summary.total}</p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Monthly Expense</p>
-                <p className="text-xl font-medium text-gray-800">₹{summary.monthly}</p>
+              <div className="pt-2 border-t border-gray-100">
+                <p className="text-xs uppercase tracking-wider text-gray-500 font-medium"> This Month</p>
+                <p className="text-xl font-semibold text-gray-800 mt-1">₹{summary.monthly}</p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Highest Expense</p>
-                <p className="text-xl font-medium text-gray-800">₹{summary.highest}</p>
+              <div className="pt-2 border-t border-gray-100">
+                <p className="text-xs uppercase tracking-wider text-gray-500 font-medium">Highest This Month</p>
+                <p className="text-xl font-semibold text-gray-800 mt-1">₹{summary.highest}</p>
               </div>
             </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <MonthlyPieChart />
           </div>
         </div>
 
         {/* Right side - Groups */}
-        <div className="w-3/4 space-y-4">
+        <div className="w-3/4 space-y-6">
           {groups?.map((group) => (
-            <div key={group.id} className="bg-white border border-gray-200">
-              <div className="flex justify-between items-center px-3 py-2 border-b border-gray-200 bg-gray-50">
-                <h2 className="text-base font-medium font-bold text-gray-700">{group.name}</h2>
+            <div key={group.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="flex justify-between items-center px-5 py-3 bg-white border-b border-gray-100">
+                <h2 className="text-sm font-semibold text-gray-800">{group.name}</h2>
                 <button
                   onClick={() => {
                     setExpenseGroupId(group.id);
                     setAddExpenseModal(true);
                   }}
-                  className="bg-gray-600 text-white px-2 py-1 text-xs rounded-sm hover:bg-gray-700 transition-all duration-200"
+                  className="bg-gray-700 text-white px-3 py-1 text-xs rounded hover:bg-gray-800 transition-colors duration-200"
                 >
                   Add Expense
                 </button>
               </div>
 
-              <div className="max-h-[120px] overflow-y-auto scrollbar">
+              <div className="max-h-[180px] overflow-y-auto scrollbar">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10">
-                    <tr>
-                      <th className="text-left px-3 py-2 font-medium">Description</th>
-                      <th className="text-right px-3 py-2 font-medium w-24">Amount</th>
-                      <th className="text-left px-3 py-2 font-medium w-28">Date</th>
-                      <th className="text-right px-3 py-2 font-medium w-24">Actions</th>
+                  <thead className="bg-gray-50 sticky top-0 z-10">
+                    <tr className="text-gray-600 text-xs uppercase tracking-wider">
+                      <th className="text-left px-5 py-2 font-medium">Description</th>
+                      <th className="text-right px-5 py-2 font-medium w-28">Amount</th>
+                      <th className="text-left px-5 py-2 font-medium w-28">Date</th>
+                      <th className="text-right px-5 py-2 font-medium w-24">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100">
                     {group.expenses?.length ? (
                       group.expenses.map((expense) => (
-                        <tr key={expense.id} className="border-t border-gray-100 hover:bg-gray-50">
-                          <td className="px-3 py-1.5 text-gray-800">{expense.description}</td>
-                          <td className="px-3 py-1.5 text-right text-gray-800">₹{expense.amount}</td>
-                          <td className="px-3 py-1.5 text-gray-500 text-sm">{expense.date}</td>
-                          <td className="px-3 py-1.5 text-right whitespace-nowrap">
+                        <tr key={expense.id} className="hover:bg-gray-50 transition-colors duration-150">
+                          <td className="px-5 py-2 text-gray-800">{expense.description}</td>
+                          <td className="px-5 py-2 text-right font-medium text-gray-800">₹{expense.amount}</td>
+                          <td className="px-5 py-2 text-gray-600 text-sm">{expense.date}</td>
+                          <td className="px-5 py-2 text-right flex justify-end gap-2">
+
                             <button
                               onClick={() => {
                                 setEditExpenseData({
@@ -187,13 +197,13 @@ return (
                                 });
                                 setEditExpenseModal(true);
                               }}
-                              className="text-gray-600 hover:text-gray-800 px-1.5 py-0.5 text-xs mr-1"
+                              className="text-gray-600 hover:text-gray-800 text-xs font-medium flex"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleDeleteExpense(expense.id)}
-                              className="text-red-600 hover:text-red-700 px-1.5 py-0.5 text-xs"
+                              className="text-red-600 hover:text-red-700 text-xs font-medium"
                             >
                               Delete
                             </button>
