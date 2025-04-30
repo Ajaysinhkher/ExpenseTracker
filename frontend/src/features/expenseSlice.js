@@ -56,10 +56,29 @@ export const deleteExpense = createAsyncThunk('expense/delete', async (expenseId
 });
 
 
+export const getTotalExpense = createAsyncThunk('expense/total',async(_,thunkAPI)=>{
+    try{
+      console.log("inside get totalexpense");
+
+      const response  = await axiosInstance.get('/expense/total');
+      console.log("total expense :",response.data);
+      
+      return response.data; 
+    }catch(error){
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Total not fetched!');
+    }
+
+});
+
 const initialState = {
   expenses: [],
   isLoading: false,
   error: null,
+  summary: {
+    total: null,
+    monthly: null,
+    highest: null,
+  },
 };
 
 const expenseSlice = createSlice({
@@ -71,18 +90,8 @@ const expenseSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+   
     builder
-      .addCase(getExpenses.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getExpenses.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.expenses = action.payload.expenses; // Update the state with fetched expenses
-      })
-      .addCase(getExpenses.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
       .addCase(addExpense.pending, (state) => {
         state.isLoading = true;
       })
@@ -127,7 +136,22 @@ const expenseSlice = createSlice({
       .addCase(deleteExpense.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      }); 
+      })
+      .addCase(getTotalExpense.pending, (state) => {
+        
+        state.isLoading = true;
+      })
+      .addCase(getTotalExpense.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.summary.total = action.payload.total_expense;
+        state.summary.monthly = action.payload.monthly_expense;
+        state.summary.highest = action.payload.highest_expense;
+      })
+      .addCase(getTotalExpense.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      
       
   },
 });

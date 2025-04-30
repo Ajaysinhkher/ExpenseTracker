@@ -5,6 +5,7 @@ use App\Models\Group;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ExpenseController extends Controller
 {
@@ -90,4 +91,42 @@ class ExpenseController extends Controller
         return response()->json(['message' => 'Expense deleted successfully!']);
     }
     
+
+  
+
+    public function total(Request $request)
+    {
+        $user = Auth::user();
+    
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated user'], 401);
+        }
+    
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+    
+        $baseQuery = Expense::whereHas('group', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        });
+    
+        $totalExpense = $baseQuery->sum('amount');
+    
+        $monthlyExpense = (clone $baseQuery)
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
+            ->sum('amount');
+    
+        $highestExpenseThisMonth = (clone $baseQuery)
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
+            ->max('amount');
+    
+        return response()->json([
+            'total_expense' => $totalExpense,
+            'monthly_expense' => $monthlyExpense,
+            'highest_expense' => $highestExpenseThisMonth
+        ]);
+    }
+    
+           
 }

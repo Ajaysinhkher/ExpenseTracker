@@ -22,3 +22,5 @@ Route::middleware('auth:sanctum')->post('/group/add',[GroupController::class,'cr
 Route::middleware('auth:sanctum')->post('/expense/add',[ExpenseController::class,'create']);
 Route::middleware('auth:sanctum')->put('/expense/update',[ExpenseController::class,'update']);
 Route::middleware('auth:sanctum')->delete('/expense/delete/{id}',[ExpenseController::class,'destroy']);
+
+Route::middleware('auth:sanctum')->get('/expense/total',[ExpenseController::class,'total']);
