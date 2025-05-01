@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../features/authSlice';
+import { logoutUser } from '../../features/authSlice';
 import { useNavigate } from 'react-router';
 
 function Header() {
@@ -8,8 +8,8 @@ function Header() {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await dispatch(logoutUser()).unwrap()
     navigate('/');
   };
 

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import axiosInstance from '../axios';
+import { addExpense, updateExpense, deleteExpense } from './expenseSlice';
 
 
 // const API_URL = 'http://127.0.0.1:8000/api';
@@ -70,7 +71,50 @@ const groupSlice  = createSlice({
         .addCase(addGroup.rejected, (state, action) => {
           state.isLoading = false;
           state.error = action.payload;
+        })
+        // listen to actions of expense slice aand accordingly update the state in groups.expense to avoid unnecessary api calls.
+        .addCase(addExpense.fulfilled, (state, action) => {
+          const newExpense = action.payload.expense;
+          const group = state.groups.find(g => g.id === newExpense.group_id);
+          if (group) {
+            group.expenses.push(newExpense);
+          }
+        })
+        .addCase(updateExpense.fulfilled, (state, action) => {
+          const updatedExpense = action.payload.expense;
+          const group = state.groups.find(g => g.id === updatedExpense.group_id);
+          if (group) {
+            const index = group.expenses.findIndex(exp => exp.id === updatedExpense.id);
+            if (index !== -1) {
+              group.expenses[index] = updatedExpense;
+            }
+          }
+        })
+        .addCase(deleteExpense.fulfilled, (state, action) => {
+
+          console.log("inside addcase delete");
+          
+          const deletedExpenseId = action.payload.expense.id;
+          console.log("expense index",deletedExpenseId);
+          const groupIndex = state.groups.findIndex(g => g.id === action.payload.expense.group_id);
+          console.log("group index",groupIndex);
+          
+          if (groupIndex !== -1) {
+            const group = state.groups[groupIndex];
+        
+            // Create a new expenses array
+            const updatedExpenses = group.expenses.filter(exp => exp.id !== deletedExpenseId);
+            console.log("updated expense array:",updatedExpenses);
+            
+            // Replace the group object with a new object to ensure immutability
+            state.groups[groupIndex] = {
+              ...group,
+              expenses: updatedExpenses
+            };
+          }
         });
+        
+   
 
     }
 });

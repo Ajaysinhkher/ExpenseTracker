@@ -21,7 +21,7 @@ function Layout() {
     if (token && !user) {
       dispatch(getUser());
     }
-  }, [dispatch, token, user]);
+  }, [dispatch,user]);
 
   if (!token) {
     return <Navigate to="/" replace />;

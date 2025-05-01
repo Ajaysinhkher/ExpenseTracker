@@ -42,6 +42,20 @@ export const getUser = createAsyncThunk('auth/getUser', async (_, thunkAPI) => {
   }
 });
 
+
+export const logoutUser = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+  try {
+    const response = await axiosInstance.post(`${API_URL}/logout`);
+    localStorage.removeItem('token');
+    return response.data;
+  } catch (err) {
+    localStorage.removeItem('token'); // Fallback clear token
+    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Logout failed');
+  }
+});
+
+
+
 const initialState = {
   user: null,
   isLoading: false,
@@ -56,10 +70,7 @@ const authSlice = createSlice({
     toggleMode: (state) => {
       state.isRegister = !state.isRegister;
     },
-    logout: (state) => {
-      state.user = null;
-      localStorage.removeItem('token');
-    }
+   
   },
   extraReducers: (builder) => {
     builder
@@ -103,9 +114,23 @@ const authSlice = createSlice({
       .addCase(getUser.rejected, (state, action) => {
         state.error = action.payload;
         state.isLoading = false;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.isLoading = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.user = null; // Clear user anyway
+        state.isLoading = false;
+        state.error = action.payload;
       });
+  
   },
 });
 
-export const { toggleMode, logout } = authSlice.actions;
+export const { toggleMode} = authSlice.actions;
 export default authSlice.reducer;

@@ -9,8 +9,8 @@ import { addGroupValidation } from '../validation/addGroupValidation';
 function Dashboard() {
   const dispatch = useDispatch();
   const groups = useSelector((state) => state.group.groups);
-  console.log(groups);
-  
+  // console.log(groups);
+  const { user } = useSelector(state => state.auth);
   const summary = useSelector((state) => state.expense.summary);
   // console.log("summary",summary)
 
@@ -34,14 +34,18 @@ function Dashboard() {
 
 
   useEffect(() => {
-    dispatch(getGroup());
-    dispatch(getTotalExpense());
-  }, [dispatch]);
+    if (user) {
+      dispatch(getGroup());
+      dispatch(getTotalExpense());
+    }
+  }, [user, dispatch]);
 
   const handleSubmitGroup = (e) => {
     e.preventDefault();
     if (groupName.trim()) {
       dispatch(addGroup({ name: groupName, expenses: [] }));
+      // console.log("groups:",groups);
+      
       setGroupName('');
       setAddGroupModal(false);
     }
@@ -56,7 +60,7 @@ function Dashboard() {
         amount,
         date: expenseDate,
       }));
-      dispatch(getGroup());
+      // dispatch(getGroup());
       dispatch(getTotalExpense());
       setDescription('');
       setAmount('');
@@ -72,7 +76,7 @@ function Dashboard() {
     e.preventDefault();
     const { id, group_id, description, amount, date } = editExpenseData;
     dispatch(updateExpense({ id, group_id, description, amount, date }));
-    dispatch(getGroup());
+    // dispatch(getGroup());
     dispatch(getTotalExpense());
     setEditExpenseModal(false);
  
@@ -81,7 +85,7 @@ function Dashboard() {
 
   const handleDeleteExpense = (expenseId)=>{
     dispatch(deleteExpense(expenseId));
-    dispatch(getGroup());
+    // dispatch(getGroup());
   }
 
   // handle download pdf onclick:
