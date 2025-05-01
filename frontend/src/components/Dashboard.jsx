@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addGroup, getGroup } from '../features/groupSlice';
 import { addExpense,updateExpense ,deleteExpense,getTotalExpense ,downloadPDF,downloadCsv} from '../features/expenseSlice';
 import MonthlyPieChart from './MonthlyPieChart';
+import { addGroupValidation } from '../validation/addGroupValidation';
 
 
 function Dashboard() {
@@ -92,6 +93,8 @@ function Dashboard() {
   const handleCsvDownload = (groups)=>{
     dispatch(downloadCsv(groups));
   }
+
+
 
 return (
   <div className="min-h-screen bg-gray-50">
@@ -248,14 +251,15 @@ return (
       <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-md w-80">
           <h3 className="text-lg font-semibold mb-4">Add Group</h3>
-          <form onSubmit={handleSubmitGroup}>
+          <form id="addGroupForm"onSubmit={handleSubmitGroup}>
             <input
               type="text"
+              name='groupName'
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="Group name"
               className="w-full border px-3 py-2 mb-4 rounded"
-              required
+              // required
             />
             <div className="flex justify-end gap-2">
               <button

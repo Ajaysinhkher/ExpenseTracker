@@ -101,7 +101,6 @@ export const downloadCsv = createAsyncThunk('expense/downloadCSV', async (groups
       responseType: 'blob',
       headers: {
         'Accept': 'text/csv',
-        // 'Content-Type': 'application/json',
       },
     });
 

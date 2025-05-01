@@ -14,6 +14,7 @@ function Login() {
     password: ''
   });
 
+  const [errors, setErrors] = useState({});
 
   // navigate to particular route as soon as user gets logged in:
 
@@ -25,6 +26,17 @@ function Login() {
   }, [user, navigate]);
 
 
+  const handleToggleMode = () => {
+    dispatch(toggleMode());
+    setErrors({});       // 🔥 clear previous errors
+    setFormData({        // (optional) clear form fields
+      name: '',
+      email: '',
+      password: ''
+    });
+  };
+  
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -35,14 +47,46 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const formErrors  = validaateForm(formData);
+    setErrors(formErrors) ;
+
+    if(Object.keys(formErrors).length>0){
+      return 
+    }
+
     if (isRegister) {
       dispatch(registerUser(formData));
+
       // console.log("inside register user");
       
     } else {
       dispatch(loginUser(formData));
     }
   };
+
+  const validaateForm = (data)=>{
+    const newErrors = {};
+
+    if(isRegister && !data.name.trim()){
+      newErrors.name = 'Name is required.';
+    }
+
+    if(!data.email.trim()){
+      newErrors.email = 'Email is required.';
+    }
+    else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){
+      newErrors.email = 'Email is invalid';
+    }
+
+    if (!data.password) {
+      newErrors.password = 'Password is required.';
+    } else if (data.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters.';
+    }
+
+    return newErrors;
+  }
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -67,11 +111,13 @@ function Login() {
                 id="name"
                 value={formData.name}
                 onChange={handleChange}
-                required
+                // required
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
               />
             </div>
           )}
+          {isRegister && errors.name && (<p className="text-red-500 text-xs mt-1">{errors.name}</p>)}
+
 
           <div>
             <label htmlFor="email" className="block font-medium mb-1">Email</label>
@@ -81,10 +127,11 @@ function Login() {
               id="email"
               value={formData.email}
               onChange={handleChange}
-              required
+           
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />
           </div>
+          {errors.email && ( <p className="text-red-500 text-xs mt-1">{errors.email}</p>)}
 
           <div>
             <label htmlFor="password" className="block font-medium mb-1">Password</label>
@@ -94,10 +141,11 @@ function Login() {
               id="password"
               value={formData.password}
               onChange={handleChange}
-              required
+              // required
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />
           </div>
+          {errors.password && ( <p className="text-red-500 text-xs mt-1">{errors.password}</p>)}
 
           <button
             type="submit"
@@ -113,7 +161,7 @@ function Login() {
             {isRegister ? 'Already have an account?' : "Don't have an account?"}
             <button
               type="button"
-              onClick={() => dispatch(toggleMode())}
+              onClick={handleToggleMode}
               className="text-blue-600 ml-2 hover:underline"
             >
               {isRegister ? 'Login here' : 'Register here'}

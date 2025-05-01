@@ -16,23 +16,16 @@ const router = createBrowserRouter([
   },
 
   {
-   
     Component:Layout,
     children:[
       {  
           path:"dashboard",
           Component: Dashboard              
-      },
-      // {
-      //     path:"create",
-      //     Component:CreateNote,
-      // },      
-      
+      },      
   ],
   }
 
 ]);
-
 
 createRoot(document.getElementById('root')).render(
 

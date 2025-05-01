@@ -12,7 +12,7 @@ class GroupController extends Controller
     {
         $request->validate([
 
-            'name'=>'required',
+            'name'=>'required|min:3',
         ]);    
 
         // Get the currently authenticated user 
@@ -49,3 +49,5 @@ class GroupController extends Controller
     }
     
 }
+
+

@@ -121,7 +121,7 @@ class ExpenseController extends Controller
         $highestExpenseThisMonth = (clone $baseQuery)
             ->whereYear('date', $currentYear)
             ->whereMonth('date', $currentMonth)
-            ->max('amount');
+            ->max('amount') ?? 0;  //max() will return null if no dat afound for this month  so use condition to make it 0
     
         return response()->json([
             'total_expense' => $totalExpense,

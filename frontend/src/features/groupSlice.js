@@ -6,6 +6,9 @@ import axiosInstance from '../axios';
 
 export const addGroup = createAsyncThunk('group/add', async (newGroup, thunkAPI) => {
     try {
+
+      console.log("inside add group:");
+      
       const response = await axiosInstance.post('/group/add', newGroup);
         console.log("newgroup object:",newGroup);
       return response.data; 

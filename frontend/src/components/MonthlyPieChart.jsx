@@ -19,7 +19,7 @@ const MonthlyPieChart = () => {
     const monthMap = {};
 
     groups.forEach(group => {
-      group.expenses.forEach(expense => {
+      (group.expenses || []).forEach(expense => {
         const month = dayjs(expense.date).format("MMM"); // e.g., "Apr"
         const amount = parseFloat(expense.amount);
 
